@@ -6,9 +6,11 @@
 //
 
 #include <iostream>
+#include "customErrorClass.h"
+#include "AVL.hpp"
 
 int main(int argc, const char * argv[]) {
-    // insert code here...
-    std::cout << "Hello, World!\n";
-    return 0;
+    c_AVL myTree;
+    myTree.createNode(-100);
+    int j;
 }
