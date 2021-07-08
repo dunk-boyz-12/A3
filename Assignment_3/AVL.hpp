@@ -10,6 +10,21 @@
 
 #include <stdio.h>
 
+enum e_Commands {
+    INSERT_NODE = 0,
+    DELETE_NODE = 1,
+    PRINT_TREE = 2,
+    DELETE_TREE = 8,
+    QUIT = 9
+};
+
+enum e_Cases {
+    CASE_1 = 1,
+    CASE_2 = 2,
+    CASE_3 = 3,
+    CASE_4 = 4
+};
+
 struct s_Node {
     int value;
     int leftHeight;
@@ -28,8 +43,27 @@ public:
 private:
     s_Node* root;
     int nodeCount;
+    
     s_Node* p_createNode(int);
+    s_Node* p_rotateRight(s_Node*);
+    s_Node* p_rotateLeft(s_Node*);
+    
+    //INSERTION
     s_Node* p_insert(s_Node*, s_Node*);
+    int p_manageInsertionCase(s_Node*,s_Node*,s_Node*);
+    void p_updateFixHeight(s_Node*);
+    void p_handleInsertCase(s_Node*,s_Node*,s_Node*,int);
+    void p_caseOne(s_Node*,s_Node*,s_Node*);
+    void p_caseTwo(s_Node*,s_Node*,s_Node*);
+    void p_caseThree(s_Node*,s_Node*,s_Node*);
+    void p_caseFour(s_Node*,s_Node*,s_Node*);
+    
+    //DELETION
+
+    //fix tree
+    //find situation (insert case) were in to fix, 1 of 4
+
+    //all deletion functions
 };
 
 

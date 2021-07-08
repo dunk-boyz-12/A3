@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		07684230269121DC003F89D7 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0768422F269121DC003F89D7 /* main.cpp */; };
+		0768423826912261003F89D7 /* AVL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0768423626912261003F89D7 /* AVL.cpp */; };
+		0768423B26912C68003F89D7 /* customErrorClass.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0768423A26912C68003F89D7 /* customErrorClass.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +27,12 @@
 /* Begin PBXFileReference section */
 		0768422C269121DC003F89D7 /* Assignment_3 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Assignment_3; sourceTree = BUILT_PRODUCTS_DIR; };
 		0768422F269121DC003F89D7 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		0768423626912261003F89D7 /* AVL.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AVL.cpp; sourceTree = "<group>"; };
+		0768423726912261003F89D7 /* AVL.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AVL.hpp; sourceTree = "<group>"; };
+		0768423926912C68003F89D7 /* customErrorClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = customErrorClass.h; sourceTree = "<group>"; };
+		0768423A26912C68003F89D7 /* customErrorClass.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = customErrorClass.cpp; sourceTree = "<group>"; };
+		0768423C26912DE3003F89D7 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		07A81B4026965E1700127F7F /* SampleInput1.dat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SampleInput1.dat; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,7 +65,13 @@
 		0768422E269121DC003F89D7 /* Assignment_3 */ = {
 			isa = PBXGroup;
 			children = (
+				07A81B4026965E1700127F7F /* SampleInput1.dat */,
+				0768423A26912C68003F89D7 /* customErrorClass.cpp */,
+				0768423926912C68003F89D7 /* customErrorClass.h */,
 				0768422F269121DC003F89D7 /* main.cpp */,
+				0768423626912261003F89D7 /* AVL.cpp */,
+				0768423726912261003F89D7 /* AVL.hpp */,
+				0768423C26912DE3003F89D7 /* README.md */,
 			);
 			path = Assignment_3;
 			sourceTree = "<group>";
@@ -119,6 +133,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				07684230269121DC003F89D7 /* main.cpp in Sources */,
+				0768423826912261003F89D7 /* AVL.cpp in Sources */,
+				0768423B26912C68003F89D7 /* customErrorClass.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

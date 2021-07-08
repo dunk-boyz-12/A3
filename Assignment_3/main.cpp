@@ -10,7 +10,20 @@
 #include "AVL.hpp"
 
 int main(int argc, const char * argv[]) {
-    c_AVL myTree;
-    myTree.createNode(-100);
+    //try {
+        c_AVL myTree;
+    /*myTree.insert(50);
+    myTree.insert(25);
+    myTree.insert(75);
+    myTree.insert(10);
+    myTree.insert(29);
+    myTree.insert(4);*/
+    myTree.insert(50);
+    myTree.insert(75);
+    myTree.insert(85);
     int j;
+    //} catch(MyException& error) {
+        //std::cout << error.what();
+        //continue;
+    //}
 }
