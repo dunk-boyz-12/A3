@@ -40,13 +40,19 @@ public:
     ~c_AVL();
     void insert(int);
     s_Node* createNode(int);
+    void readFile(char*);
+    
 private:
     s_Node* root;
     int nodeCount;
+    bool quitProgram;
     
+    void p_readFile(char*);
     s_Node* p_createNode(int);
     s_Node* p_rotateRight(s_Node*);
     s_Node* p_rotateLeft(s_Node*);
+    void p_printTree(s_Node*);
+    void p_formattedPrint(s_Node*,int);
     
     //INSERTION
     s_Node* p_insert(s_Node*, s_Node*);
@@ -59,10 +65,8 @@ private:
     void p_caseFour(s_Node*,s_Node*,s_Node*);
     
     //DELETION
-
-    //fix tree
-    //find situation (insert case) were in to fix, 1 of 4
-
+    void p_deleteTree(s_Node*);
+    void p_recDelete(s_Node* root);
     //all deletion functions
 };
 

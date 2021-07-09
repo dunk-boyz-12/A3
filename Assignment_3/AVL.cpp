@@ -5,6 +5,9 @@
 //  Created by Nicholas Buras on 7/3/21.
 //
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <sys/stat.h>
 
 #include "AVL.hpp"
 #include "customErrorClass.h"
@@ -16,14 +19,17 @@ c_AVL::c_AVL() {
 }
 
 c_AVL::~c_AVL() {
-    
+    //if 9(Quit) is not encountered
+    if(!this->quitProgram){
+        this->p_deleteTree(this->root);
+    }
 }
 
 s_Node* c_AVL::createNode(int value) {
     s_Node* newNode;
-    if(value <= 0) {
+    if(value < 0) {
         //throw exception
-        throw MyException("shooooooooot ! ");
+        throw MyException("Error ! Node value must be a positive integer or 0.");
     } else {
         newNode = this->p_createNode(value);
     }
@@ -33,8 +39,9 @@ s_Node* c_AVL::createNode(int value) {
 void c_AVL::insert(int value) {
     s_Node* newNode = this->createNode(value);
     if(!newNode) {
-        throw MyException("Error ! ");
+        throw MyException("Error ! Node with a value: was not created.");
     } else {
+        std::cout << "Inserting Node with value: " << newNode->value << std::endl;
         //insert node into tree
         this->root = this->p_insert(this->root, newNode);
         //update node count
@@ -43,7 +50,59 @@ void c_AVL::insert(int value) {
         this->p_updateFixHeight(newNode);
     }
 }
+
+void c_AVL::readFile(char* fileName) {
+    //check that file is not empty
+    //struct stat fileStat;
+    //this->fileSize = fileStat.st_size;
+    //if(this->fileSize == 0){
+        //throw MyException("Error ! Could not open desired input file.");
+    //} else {
+        this->p_readFile(fileName);
+    //}
+}
 /* ############################   PRIVATE FUNCTIONS   ############################ */
+void c_AVL::p_readFile(char* fileName) {
+    this->quitProgram = false;
+    ifstream fileToRead(fileName); //open input file
+    int inputData;
+    
+    if(!fileToRead.is_open()){
+        throw MyException("Error ! Could not open the input file correctly.");
+    } else {
+        while (!fileToRead.eof() || !quitProgram) {
+            fileToRead >> inputData;
+            switch (inputData) {
+                case INSERT_NODE:
+                    fileToRead >> inputData;
+                    std::cout << "Inserting Node with value: " << inputData << std::endl;
+                    this->insert(inputData);
+                    break;
+                case DELETE_NODE:
+                    fileToRead >> inputData;
+                    //call to delete node functions
+                    std::cout << "Deleting Node with value: " << inputData << std::endl;
+                    break;
+                case PRINT_TREE:
+                    std::cout << "Current AVL Tree" << std::endl;
+                    this->p_printTree(this->root);
+                    break;
+                case DELETE_TREE:
+                    std::cout << "Deleting AVL Tree" << std::endl;
+                    this->p_deleteTree(this->root);
+                    break;
+                case QUIT:
+                    //set quit flag
+                    quitProgram = true;
+                    std::cout << "Quiting Program, GoodBye !" << inputData << std::endl;
+                    break;
+            }
+        }
+    }
+    //close file
+    fileToRead.close();
+}
+
 s_Node* c_AVL::p_createNode(int value) {
     s_Node* newNode = new s_Node();
     newNode->value = value;
@@ -123,12 +182,33 @@ s_Node* c_AVL::p_rotateLeft(s_Node* nodeToRotate) {
     return rightChild;
 }
 
+void c_AVL::p_printTree(s_Node* root) {
+    int indent = 4;
+    if(root == nullptr) {
+        throw MyException("Error ! Tree is empty.");;
+    } else {
+        this->p_formattedPrint(root, indent);
+    }
+}
+
+void c_AVL::p_formattedPrint(s_Node* root, int indent){
+    if(root == nullptr) {
+        return;
+    } else {
+        this->p_formattedPrint(root->left, indent + 4);
+        std::cout << root->value << std::endl;
+        this->p_formattedPrint(root->left, indent + 4);
+    }
+}
+
 /* #############   INSERTION FUNCTIONS   ############# */
 
 s_Node* c_AVL::p_insert(s_Node* root, s_Node* node) {
     //throw exception if value is already in tree, add check for  that
     if(root == nullptr){
         return node;
+    } else if(root->value == node->value){
+        throw MyException("Error ! Node has already been inserted into the tree.");
     } else if(node->value < root->value) {
         root->left = this->p_insert(root->left, node);
         //keep track of parent
@@ -161,12 +241,13 @@ void c_AVL::p_updateFixHeight(s_Node* node) {
         }
         //check for height imbalance
         if(abs(node->leftHeight - node->rightHeight) > 1) {
-            /* get insertion case, pass node of imbalance */
+            /* get insertion case, pass node of imbalance and "path back" */
             insertionCase = this->p_manageInsertionCase(node, child, grandChild);
             this->p_handleInsertCase(node, child, grandChild, insertionCase);
+            //exit loop, tree is fixed
             break;
         }
-        /*track correct path - children/grandchildren nodes of node of imbalance
+        /* track correct path - children/grandchildren nodes of node of imbalance
         for case management */
         if(child->left || child->right) {
             grandChild = grandChild->parent;
@@ -181,6 +262,7 @@ void c_AVL::p_updateFixHeight(s_Node* node) {
 
 int c_AVL::p_manageInsertionCase(s_Node* nodeOfImbalance, s_Node* child, s_Node* grandChild) {
     e_Cases caseNumber;
+    //find formation of children(case) based on the path
     if(child == nodeOfImbalance->left){
         if(grandChild == child->right){
             caseNumber = CASE_1;
@@ -215,19 +297,53 @@ void c_AVL::p_handleInsertCase(s_Node* nodeOfImbalance, s_Node* child, s_Node* g
 }
 
 void c_AVL::p_caseOne(s_Node* grandParent, s_Node* Parent, s_Node* child) {
-    
+    //gp is node of imbalance
+    //left rotate parent
+    s_Node* nodeToRotate = Parent;
+    nodeToRotate = this->p_rotateLeft(nodeToRotate);
+    //right rotate gp
+    nodeToRotate = grandParent;
+    nodeToRotate = this->p_rotateRight(nodeToRotate);
 }
 
 void c_AVL::p_caseTwo(s_Node* grandParent, s_Node* Parent, s_Node* child) {
-    
+    //gp is node of imbalance
+    //right rotate parent
+    s_Node* nodeToRotate = Parent;
+    nodeToRotate = this->p_rotateRight(nodeToRotate);
+    //left rotate gp
+    nodeToRotate = grandParent;
+    nodeToRotate = this->p_rotateLeft(nodeToRotate);
 }
 
 void c_AVL::p_caseThree(s_Node* grandParent, s_Node* Parent, s_Node* child) {
-    
+    //right rotate gp
+    s_Node* nodeToRotate = grandParent;
+    grandParent = this->p_rotateRight(nodeToRotate);
 }
 
 void c_AVL::p_caseFour(s_Node* grandParent, s_Node* Parent, s_Node* child) {
-    
+    //left rotate gp
+    s_Node* nodeToRotate = grandParent;
+    grandParent = this->p_rotateLeft(nodeToRotate);
 }
 
 /* #############   DELETEION FUNCTIONS   ############# */
+
+void c_AVL::p_deleteTree(s_Node* root) {
+    if(root == NULL) {
+        throw MyException("Error ! Tree is empty.");
+    } else {
+        this->p_recDelete(root);
+    }
+}
+
+void c_AVL::p_recDelete(s_Node* root) {
+    if(root == NULL) {
+        return;
+    } else {
+        this->p_deleteTree(root->left);
+        this->p_deleteTree(root->right);
+        delete root;
+    }
+}
