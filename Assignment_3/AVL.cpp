@@ -14,11 +14,26 @@
 #include "customErrorClass.h"
 
 /* ############################   PUBLIC FUNCTIONS   ############################ */
+
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: Create AVL tree instance, set root and nodeCount vars
+ **
+ **    Function Output: None
+ **    Side Effects: None
+ */
 c_AVL::c_AVL() {
     this->root = nullptr;
     this->nodeCount = 0;
 }
 
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: Destroy AVL tree instance
+ **
+ **    Function Output: None
+ **    Side Effects: None
+ */
 c_AVL::~c_AVL() {
     //if 9(Quit) is not encountered
     //if(!this->quitProgram){
@@ -26,6 +41,13 @@ c_AVL::~c_AVL() {
     //}
 }
 
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: Check that value >= 0
+ **
+ **    Function Output: Newly created node
+ **    Side Effects: calls private createNode function
+ */
 s_Node* c_AVL::createNode(int value) {
     s_Node* newNode;
     if(value < 0) {
@@ -37,21 +59,32 @@ s_Node* c_AVL::createNode(int value) {
     return newNode;
 }
 
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: verify node is created, insert it into tree, update heights for each subtree
+ **
+ **    Function Output: None
+ **    Side Effects: Root could be changed, node left/right heights could change
+ */
 void c_AVL::insert(int value) {
     s_Node* newNode = this->createNode(value);
     if(!newNode) {
         throw MyException("Error ! Node with a value: was not created.");
     } else {
-        std::cout << "Inserting Node with value: " << newNode->value << std::endl;
         //insert node into tree
         this->root = this->p_insert(this->root, newNode);
-        //update node count
-        //this->nodeCount++;
         //fix node sub tree heights
         this->p_updateFixHeight(newNode);
     }
 }
 
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: Call to private readFile
+ **
+ **    Function Output: None
+ **    Side Effects: None
+ */
 void c_AVL::readFile(char* fileName) {
     //check that file is not empty
     //struct stat fileStat;
@@ -62,7 +95,16 @@ void c_AVL::readFile(char* fileName) {
         this->p_readFile(fileName);
     //}
 }
+
 /* ############################   PRIVATE FUNCTIONS   ############################ */
+
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: open desired file, read integers/commands from file
+ **
+ **    Function Output: The correct action is taken according to the command to manage AVL tree
+ **    Side Effects: file stream created, nodeCount changes, tree could be altered
+ */
 void c_AVL::p_readFile(char* fileName) {
     this->quitProgram = false;
     ifstream fileToRead(fileName); //open input file
@@ -95,7 +137,7 @@ void c_AVL::p_readFile(char* fileName) {
                 case QUIT:
                     //set quit flag
                     this->quitProgram = true;
-                    std::cout << "Quiting Program, GoodBye !";
+                    std::cout << "Quiting Program, GoodBye !" << std::endl;
                     break;
             }
         }
@@ -104,6 +146,13 @@ void c_AVL::p_readFile(char* fileName) {
     fileToRead.close();
 }
 
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: create new node to be placed into tree
+ **
+ **    Function Output: newly created node
+ **    Side Effects: None
+ */
 s_Node* c_AVL::p_createNode(int value) {
     s_Node* newNode = new s_Node();
     newNode->value = value;
@@ -115,6 +164,13 @@ s_Node* c_AVL::p_createNode(int value) {
     return newNode;
 }
 
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: rotate a desired node to the right, update new subtree heights for nodes that moved/relationships changed
+ **
+ **    Function Output: node that was rotated into its place
+ **    Side Effects: node relationships are changed within the tree, root could change, subtree heights are changed
+ */
 s_Node* c_AVL::p_rotateRight(s_Node* nodeToRotate) {
     s_Node* leftChild = nodeToRotate->left;
     s_Node* Parent = nodeToRotate->parent;
@@ -149,6 +205,13 @@ s_Node* c_AVL::p_rotateRight(s_Node* nodeToRotate) {
     return leftChild;
 }
 
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: rotate a desired node to the left, update new subtree heights for nodes that moved/relationships changed
+ **
+ **    Function Output: node that was rotated into its place
+ **    Side Effects: node relationships are changed within the tree, root could change, subtree heights are changed
+ */
 s_Node* c_AVL::p_rotateLeft(s_Node* nodeToRotate) {
     s_Node* rightChild = nodeToRotate->right;
     s_Node* Parent = nodeToRotate->parent;
@@ -183,6 +246,13 @@ s_Node* c_AVL::p_rotateLeft(s_Node* nodeToRotate) {
     return rightChild;
 }
 
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: check that tree is not empty before calling private print
+ **
+ **    Function Output: None
+ **    Side Effects: private print is called, desired indent is passed to private function
+ */
 void c_AVL::p_printTree(s_Node* root) {
     int indent = 4;
     if(root == nullptr) {
@@ -193,6 +263,13 @@ void c_AVL::p_printTree(s_Node* root) {
     }
 }
 
+/*
+ **    Author: Nick Buras/Alex Wollman
+ **    Function Purpose: Print AVL tree according your specs/function provided for us
+ **
+ **    Function Output: AVL tree is printed to the user
+ **    Side Effects: None
+ */
 void c_AVL::p_formattedPrint(s_Node* root, int indent){
     if(root == nullptr) {
         return;
@@ -201,20 +278,27 @@ void c_AVL::p_formattedPrint(s_Node* root, int indent){
         if(indent){
             std::cout << setw(indent);
         }
-        std::cout << root->value << std::endl;
+        std::cout << root->value << " LHeight: " << root->leftHeight << " RHeight: " << root->rightHeight << std::endl;
         this->p_formattedPrint(root->right, indent + 4);
     }
 }
 
 /* #############   INSERTION FUNCTIONS   ############# */
 
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: Insert new node into tree
+ **
+ **    Function Output: (new) root of the tree
+ **    Side Effects: nodeCount is incremented
+ */
 s_Node* c_AVL::p_insert(s_Node* root, s_Node* node) {
     //throw exception if value is already in tree, add check for  that
     if(root == nullptr){
         this->nodeCount++;
         return node;
     } else if(root->value == node->value){
-        std::cout << "Node with value: " << node->value << " already exists in the tree. Skipping to next integer." << endl;
+        std::cout << "Node with value: " << node->value << " already exists in the tree. Skipping to next integer." << std::endl;
         return root;
     } else if(node->value < root->value) {
         root->left = this->p_insert(root->left, node);
@@ -228,6 +312,13 @@ s_Node* c_AVL::p_insert(s_Node* root, s_Node* node) {
     return root;
 }
 
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: updates node subtree left/right height and checks each node left & right heights for imbalances, tracks path up tree for insertion case management
+ **
+ **    Function Output: None
+ **    Side Effects: node subtree left/right height might change, manageCase could be called to fix imbalances
+ */
 void c_AVL::p_updateFixHeight(s_Node* node) {
     int rightSubTreeMax;
     int leftSubTreeMax;
@@ -267,6 +358,13 @@ void c_AVL::p_updateFixHeight(s_Node* node) {
     };
 }
 
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: figure out which of the 4 insertion cases the imbalance falls under
+ **
+ **    Function Output: Integer corresponding to the 4 insertion cases
+ **    Side Effects: None
+ */
 int c_AVL::p_manageInsertionCase(s_Node* nodeOfImbalance, s_Node* child, s_Node* grandChild) {
     e_Cases caseNumber;
     //find formation of children(case) based on the path
@@ -286,6 +384,13 @@ int c_AVL::p_manageInsertionCase(s_Node* nodeOfImbalance, s_Node* child, s_Node*
     return caseNumber;
 }
 
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: Call correct insertion case management handlers to fix imbalance correctly
+ **
+ **    Function Output: None
+ **    Side Effects: Individual insertion case functions are called
+ */
 void c_AVL::p_handleInsertCase(s_Node* nodeOfImbalance, s_Node* child, s_Node* grandChild, int caseNumber) {
     switch (caseNumber) {
         case CASE_1:
@@ -303,6 +408,13 @@ void c_AVL::p_handleInsertCase(s_Node* nodeOfImbalance, s_Node* child, s_Node* g
     }
 }
 
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: Handle case 1
+ **
+ **    Function Output: None
+ **    Side Effects: Tree is fixed according to AVL rules
+ */
 void c_AVL::p_caseOne(s_Node* grandParent, s_Node* Parent, s_Node* child) {
     //gp is node of imbalance
     //left rotate parent
@@ -313,6 +425,13 @@ void c_AVL::p_caseOne(s_Node* grandParent, s_Node* Parent, s_Node* child) {
     nodeToRotate = this->p_rotateRight(nodeToRotate);
 }
 
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: Handle case 2
+ **
+ **    Function Output: None
+ **    Side Effects: Tree is fixed according to AVL rules
+ */
 void c_AVL::p_caseTwo(s_Node* grandParent, s_Node* Parent, s_Node* child) {
     //gp is node of imbalance
     //right rotate parent
@@ -323,12 +442,26 @@ void c_AVL::p_caseTwo(s_Node* grandParent, s_Node* Parent, s_Node* child) {
     nodeToRotate = this->p_rotateLeft(nodeToRotate);
 }
 
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: Handle case 3
+ **
+ **    Function Output: None
+ **    Side Effects: Tree is fixed according to AVL rules
+ */
 void c_AVL::p_caseThree(s_Node* grandParent, s_Node* Parent, s_Node* child) {
     //right rotate gp
     s_Node* nodeToRotate = grandParent;
     grandParent = this->p_rotateRight(nodeToRotate);
 }
 
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: Handle case 4
+ **
+ **    Function Output: None
+ **    Side Effects: Tree is fixed according to AVL rules
+ */
 void c_AVL::p_caseFour(s_Node* grandParent, s_Node* Parent, s_Node* child) {
     //left rotate gp
     s_Node* nodeToRotate = grandParent;
@@ -337,6 +470,13 @@ void c_AVL::p_caseFour(s_Node* grandParent, s_Node* Parent, s_Node* child) {
 
 /* #############   DELETEION FUNCTIONS   ############# */
 
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: make sure tree is not empty, call private delete
+ **
+ **    Function Output: None
+ **    Side Effects: reset root back to nullptr
+ */
 void c_AVL::p_deleteTree(s_Node* root) {
     if(root == NULL) {
         std::cout << "Cannot delete tree, it is empty." << std::endl;
@@ -347,6 +487,13 @@ void c_AVL::p_deleteTree(s_Node* root) {
     this->root = nullptr;
 }
 
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: Delete AVL Tree
+ **
+ **    Function Output: None
+ **    Side Effects: Tree memory is deallocated
+ */
 void c_AVL::p_recDelete(s_Node* root) {
     if(root == NULL) {
         return;
