@@ -2,11 +2,12 @@
 //  AVL.cpp
 //  Assignment_3
 //
-//  Created by Nicholas Buras on 7/3/21.
+//  Created by Nicholas Buras on 6/28/21.
 //
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <iomanip>
 #include <sys/stat.h>
 
 #include "AVL.hpp"
@@ -20,16 +21,16 @@ c_AVL::c_AVL() {
 
 c_AVL::~c_AVL() {
     //if 9(Quit) is not encountered
-    if(!this->quitProgram){
-        this->p_deleteTree(this->root);
-    }
+    //if(!this->quitProgram){
+      //  this->p_deleteTree(this->root);
+    //}
 }
 
 s_Node* c_AVL::createNode(int value) {
     s_Node* newNode;
     if(value < 0) {
         //throw exception
-        throw MyException("Error ! Node value must be a positive integer or 0.");
+        throw MyException("Error ! Node values must be a positive integer or 0.");
     } else {
         newNode = this->p_createNode(value);
     }
@@ -45,7 +46,7 @@ void c_AVL::insert(int value) {
         //insert node into tree
         this->root = this->p_insert(this->root, newNode);
         //update node count
-        this->nodeCount++;
+        //this->nodeCount++;
         //fix node sub tree heights
         this->p_updateFixHeight(newNode);
     }
@@ -70,7 +71,7 @@ void c_AVL::p_readFile(char* fileName) {
     if(!fileToRead.is_open()){
         throw MyException("Error ! Could not open the input file correctly.");
     } else {
-        while (!fileToRead.eof() || !quitProgram) {
+        while (!fileToRead.eof() && !quitProgram) {
             fileToRead >> inputData;
             switch (inputData) {
                 case INSERT_NODE:
@@ -93,8 +94,8 @@ void c_AVL::p_readFile(char* fileName) {
                     break;
                 case QUIT:
                     //set quit flag
-                    quitProgram = true;
-                    std::cout << "Quiting Program, GoodBye !" << inputData << std::endl;
+                    this->quitProgram = true;
+                    std::cout << "Quiting Program, GoodBye !";
                     break;
             }
         }
@@ -185,7 +186,8 @@ s_Node* c_AVL::p_rotateLeft(s_Node* nodeToRotate) {
 void c_AVL::p_printTree(s_Node* root) {
     int indent = 4;
     if(root == nullptr) {
-        throw MyException("Error ! Tree is empty.");;
+        std::cout << "Cannot print tree, it is empty.";
+        //throw MyException("Error ! Tree is empty.");;
     } else {
         this->p_formattedPrint(root, indent);
     }
@@ -196,8 +198,11 @@ void c_AVL::p_formattedPrint(s_Node* root, int indent){
         return;
     } else {
         this->p_formattedPrint(root->left, indent + 4);
+        if(indent){
+            std::cout << setw(indent);
+        }
         std::cout << root->value << std::endl;
-        this->p_formattedPrint(root->left, indent + 4);
+        this->p_formattedPrint(root->right, indent + 4);
     }
 }
 
@@ -206,9 +211,11 @@ void c_AVL::p_formattedPrint(s_Node* root, int indent){
 s_Node* c_AVL::p_insert(s_Node* root, s_Node* node) {
     //throw exception if value is already in tree, add check for  that
     if(root == nullptr){
+        this->nodeCount++;
         return node;
     } else if(root->value == node->value){
-        throw MyException("Error ! Node has already been inserted into the tree.");
+        std::cout << "Node with value: " << node->value << " already exists in the tree. Skipping to next integer." << endl;
+        return root;
     } else if(node->value < root->value) {
         root->left = this->p_insert(root->left, node);
         //keep track of parent
@@ -332,18 +339,20 @@ void c_AVL::p_caseFour(s_Node* grandParent, s_Node* Parent, s_Node* child) {
 
 void c_AVL::p_deleteTree(s_Node* root) {
     if(root == NULL) {
-        throw MyException("Error ! Tree is empty.");
+        std::cout << "Cannot delete tree, it is empty." << std::endl;
     } else {
         this->p_recDelete(root);
     }
+    //reset root
+    this->root = nullptr;
 }
 
 void c_AVL::p_recDelete(s_Node* root) {
     if(root == NULL) {
         return;
     } else {
-        this->p_deleteTree(root->left);
-        this->p_deleteTree(root->right);
+        this->p_recDelete(root->left);
+        this->p_recDelete(root->right);
         delete root;
     }
 }

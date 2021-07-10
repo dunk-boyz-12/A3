@@ -2,7 +2,7 @@
 //  main.cpp
 //  Assignment_3
 //
-//  Created by Nicholas Buras on 7/3/21.
+//  Created by Nicholas Buras on 6/28/21.
 //
 
 #include <iostream>
@@ -14,11 +14,13 @@ int main(int argc, char * argv[]) {
     
     char* fileName = argv[1];
     
-    //try {
+    try {
         c_AVL myTree;
         myTree.readFile(fileName);
-    //} catch(MyException& error) {
-        //std::cout << error.what();
+    } catch(MyException& error) {
+        std::cout << error.what();
         //continue;
-    //}
+    } catch(exception& error) {
+        std::cout << error.what();
+    }
 }

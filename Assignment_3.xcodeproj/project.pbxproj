@@ -33,8 +33,6 @@
 		0768423926912C68003F89D7 /* customErrorClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = customErrorClass.h; sourceTree = "<group>"; };
 		0768423A26912C68003F89D7 /* customErrorClass.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = customErrorClass.cpp; sourceTree = "<group>"; };
 		0768423C26912DE3003F89D7 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		07746EF12699027400FB48E9 /* Sample2.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Sample2.txt; sourceTree = "<group>"; };
-		07746EF22699028000FB48E9 /* Sample3.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Sample3.txt; sourceTree = "<group>"; };
 		07746EF426991A7E00FB48E9 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		07A81B4026965E1700127F7F /* SampleInput1.dat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SampleInput1.dat; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -76,8 +74,6 @@
 				0768423626912261003F89D7 /* AVL.cpp */,
 				0768423726912261003F89D7 /* AVL.hpp */,
 				0768423C26912DE3003F89D7 /* README.md */,
-				07746EF12699027400FB48E9 /* Sample2.txt */,
-				07746EF22699028000FB48E9 /* Sample3.txt */,
 				07746EF426991A7E00FB48E9 /* Makefile */,
 			);
 			path = Assignment_3;
