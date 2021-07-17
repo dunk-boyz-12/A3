@@ -18,6 +18,11 @@ enum e_Commands {
     QUIT = 9
 };
 
+enum e_subTreeSide {
+    RIGHT = 0,
+    LEFT = 1
+};
+
 enum e_Cases {
     CASE_1 = 1,
     CASE_2 = 2,
@@ -41,6 +46,9 @@ public:
     void insert(int);
     s_Node* createNode(int);
     void readFile(char*);
+    //deletion
+    void deleteNode(int);
+    
     
 private:
     s_Node* root;
@@ -67,7 +75,14 @@ private:
     //DELETION
     void p_deleteTree(s_Node*);
     void p_recDelete(s_Node* root);
-    //all deletion functions
+    void p_deleteNode(s_Node*);
+    void p_postDeletionHeightFix(s_Node*,int);
+    void p_ManageDeletionCase(s_Node*,int);
+    void p_handleDeletionCase(s_Node*,s_Node*,s_Node*,int);
+    s_Node* p_findNode(s_Node*,int);
+    s_Node* p_findPredecessor(s_Node*);
+    s_Node* p_findSuccessor(s_Node*);
+    s_Node* p_swapNodes(s_Node*,s_Node*);
 };
 
 

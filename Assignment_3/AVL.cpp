@@ -35,10 +35,7 @@ c_AVL::c_AVL() {
  **    Side Effects: None
  */
 c_AVL::~c_AVL() {
-    //if 9(Quit) is not encountered
-    //if(!this->quitProgram){
-      //  this->p_deleteTree(this->root);
-    //}
+
 }
 
 /*
@@ -87,13 +84,25 @@ void c_AVL::insert(int value) {
  */
 void c_AVL::readFile(char* fileName) {
     //check that file is not empty
-    //struct stat fileStat;
-    //this->fileSize = fileStat.st_size;
-    //if(this->fileSize == 0){
-        //throw MyException("Error ! Could not open desired input file.");
-    //} else {
         this->p_readFile(fileName);
-    //}
+}
+
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: call private functions to handle deleting a node in the tree
+ **
+ **    Function Output: None
+ **    Side Effects: None
+ */
+void c_AVL::deleteNode(int value) {
+    s_Node* nodeToDelete = nullptr;
+    nodeToDelete = this->p_findNode(this->root, value);
+    
+    //if node to delete exists
+    if(nodeToDelete){
+        this->p_deleteNode(nodeToDelete);
+        
+    }
 }
 
 /* ############################   PRIVATE FUNCTIONS   ############################ */
@@ -113,32 +122,38 @@ void c_AVL::p_readFile(char* fileName) {
     if(!fileToRead.is_open()){
         throw MyException("Error ! Could not open the input file correctly.");
     } else {
+        fileToRead >> inputData;
         while (!fileToRead.eof() && !quitProgram) {
-            fileToRead >> inputData;
             switch (inputData) {
                 case INSERT_NODE:
                     fileToRead >> inputData;
                     std::cout << "Inserting Node with value: " << inputData << std::endl;
                     this->insert(inputData);
+                    fileToRead >> inputData;
                     break;
                 case DELETE_NODE:
                     fileToRead >> inputData;
                     //call to delete node functions
                     std::cout << "Deleting Node with value: " << inputData << std::endl;
+                    this->deleteNode(inputData);
+                    fileToRead >> inputData;
                     break;
                 case PRINT_TREE:
                     std::cout << "Current AVL Tree" << std::endl;
                     this->p_printTree(this->root);
+                    fileToRead >> inputData;
                     break;
                 case DELETE_TREE:
                     std::cout << "Deleting AVL Tree" << std::endl;
                     this->p_deleteTree(this->root);
+                    fileToRead >> inputData;
                     break;
                 case QUIT:
                     //set quit flag
                     this->quitProgram = true;
                     std::cout << "Quiting Program, GoodBye !" << std::endl;
                     break;
+                    
             }
         }
     }
@@ -257,7 +272,6 @@ void c_AVL::p_printTree(s_Node* root) {
     int indent = 4;
     if(root == nullptr) {
         std::cout << "Cannot print tree, it is empty.";
-        //throw MyException("Error ! Tree is empty.");;
     } else {
         this->p_formattedPrint(root, indent);
     }
@@ -472,6 +486,243 @@ void c_AVL::p_caseFour(s_Node* grandParent, s_Node* Parent, s_Node* child) {
 
 /*
  **    Author: Nick Buras
+ **    Function Purpose: retrieve node to be deleted
+ **
+ **    Function Output: node to be deleted
+ **    Side Effects: prints to the user if node is not in tree
+ */
+s_Node* c_AVL::p_findNode(s_Node* root, int value) {
+    if(root == nullptr) {
+        std::cout << "Cannot delete node with value: " << value << " because it does not exist." << std::endl;
+        //return null if not found
+        return nullptr;
+    } else if(root->value == value) {
+        return root;
+    } else if(root->value > value) {
+        return this->p_findNode(root->left, value);
+    } else {
+        return this->p_findNode(root->right, value);
+    }
+}
+
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: retrieve successor
+ **
+ **    Function Output: successor
+ **    Side Effects: None
+ */
+s_Node* c_AVL::p_findSuccessor(s_Node* node) {
+    s_Node* successor = node;
+    //might be null
+    if(successor->right){
+        successor = successor->right;
+        while (successor->left) {
+            successor = successor->left;
+        }
+    } else {
+        successor = nullptr;
+    }
+    return successor;
+}
+
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: retrieve predecessor
+ **
+ **    Function Output: predecessor
+ **    Side Effects: None
+ */
+s_Node* c_AVL::p_findPredecessor(s_Node* node) {
+    s_Node* predecessor = node;
+    //cant be null, else that means node to delete has no children and will be handled before this gets called
+    predecessor = predecessor->left;
+    while (predecessor->right) {
+        predecessor = predecessor->right;
+    }
+    return predecessor;
+}
+
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: swaps values of node to be deleted and predecessor/successor
+ **    returns node to be deleted
+ **
+ **    Function Output: Node to be deleted
+ **    Side Effects: None
+ */
+s_Node* c_AVL::p_swapNodes(s_Node* nodeToDelete, s_Node* SuccessorPredecessor) {
+    int tempValue;
+    
+        //swap with child of predecessor/successor values
+        if(SuccessorPredecessor->right){
+            //successor has right child
+            tempValue = SuccessorPredecessor->value;
+            SuccessorPredecessor->value = SuccessorPredecessor->right->value;
+            SuccessorPredecessor->right->value = tempValue;
+            //move to child
+            SuccessorPredecessor = SuccessorPredecessor->right;
+        } else if(SuccessorPredecessor->left){
+            //predecessor has left child
+            tempValue = SuccessorPredecessor->value;
+            SuccessorPredecessor->value = SuccessorPredecessor->left->value;
+            SuccessorPredecessor->left->value = tempValue;
+            //move to child
+            SuccessorPredecessor = SuccessorPredecessor->left;
+        }
+        //swap child of succ/pred with node to delete values
+        tempValue = SuccessorPredecessor->value;
+        SuccessorPredecessor->value = nodeToDelete->value;
+        nodeToDelete->value = tempValue;
+    
+    //return node to be deleted after swaps
+    return SuccessorPredecessor;
+}
+
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: private delete, handles calling delete functions
+ **
+ **    Function Output: None
+ **    Side Effects: node count is decremented
+ */
+void c_AVL::p_deleteNode(s_Node* nodeToDelete) {
+    s_Node* predecessor = nullptr;
+    s_Node* successor = nullptr;
+    s_Node* tempNode;
+    e_subTreeSide treePath;
+    
+    //if no children, just delete
+    if(nodeToDelete->left || nodeToDelete->right){
+        //try successor first
+        successor = this->p_findSuccessor(nodeToDelete);
+        //if no successor exists, use predecessor
+        if(!successor) {
+            predecessor = this->p_findPredecessor(nodeToDelete);
+            nodeToDelete = this->p_swapNodes(nodeToDelete, predecessor); //swap nodes for deletion
+        } else { //use successor
+            nodeToDelete = this->p_swapNodes(nodeToDelete, successor); //swap nodes for deletion
+        }
+    }
+    //get parent node for height fix after deletion
+    tempNode = nodeToDelete->parent;
+    //update parent pointers for node to check height
+    if(nodeToDelete == tempNode->left){
+        tempNode->left = nullptr;
+        treePath = LEFT;
+    } else {
+        tempNode->right = nullptr;
+        treePath = RIGHT;
+    }
+    //delete node
+    delete nodeToDelete;
+    //decrement node count
+    this->nodeCount--;
+    //call height update after deletion
+    this->p_postDeletionHeightFix(tempNode,treePath);
+}
+
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: find correct path for child and grandchild nodes, finds case number and calls function to handle deletion cases
+ **
+ **    Function Output: None
+ **    Side Effects: None
+ */
+void c_AVL::p_ManageDeletionCase(s_Node* node,int path) {
+    s_Node* child;
+    s_Node* grandChild;
+    int caseNumber;
+    //find path up tree to look at the other sub tree
+    switch (path) {
+        case LEFT:
+            child = node->right;
+            if(child->right){
+                grandChild = child->right;
+                caseNumber = CASE_4;
+            } else {
+                grandChild = child->left;
+                caseNumber = CASE_2;
+            }
+            break;
+        case RIGHT:
+            child = node->left;
+            if(child->left){
+                grandChild = child->left;
+                caseNumber = CASE_3;
+            } else {
+                grandChild = child->right;
+                caseNumber = CASE_1;            }
+            break;
+    }
+    //fix tree based on path chosen
+    this->p_handleDeletionCase(node, child, grandChild, caseNumber);
+}
+
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: call correct case functions to handle rebalancing tree
+ **
+ **    Function Output: None
+ **    Side Effects: None
+ */
+void c_AVL::p_handleDeletionCase(s_Node* nodeOfImbalance, s_Node* child, s_Node* grandChild, int deletionCase) {
+    switch (deletionCase) {
+        case CASE_1:
+            this->p_caseOne(nodeOfImbalance, child, grandChild);
+            break;
+        case CASE_2:
+            this->p_caseTwo(nodeOfImbalance, child, grandChild);
+            break;
+        case CASE_3:
+            this->p_caseThree(nodeOfImbalance, child, grandChild);
+            break;
+        case CASE_4:
+            this->p_caseFour(nodeOfImbalance, child, grandChild);
+            break;
+    }
+}
+
+/*
+ **    Author: Nick Buras
+ **    Function Purpose: update height of nodes after deletion, call function to handle height imbalances
+ **
+ **    Function Output: None
+ **    Side Effects: None
+ */
+void c_AVL::p_postDeletionHeightFix(s_Node* node, int path){
+    int rightSubTreeMax;
+    int leftSubTreeMax;
+    
+    while(node != nullptr) {
+        //get left sub tree max sub tree height
+        if(node->left != nullptr){
+            leftSubTreeMax = max(node->left->leftHeight,node->left->rightHeight);
+            node->leftHeight = leftSubTreeMax + 1;
+        } else {
+            node->leftHeight = 0;
+        }
+        //get right sub tree max sub tree height
+        if(node->right != nullptr) {
+            rightSubTreeMax = max(node->right->leftHeight,node->right->rightHeight);
+            node->rightHeight = rightSubTreeMax + 1;
+        } else {
+            node->rightHeight = 0;
+        }
+        //check for height imbalance
+        if(abs(node->leftHeight - node->rightHeight) > 1) {
+            /* get deletion case, pass node of imbalance */
+            this->p_ManageDeletionCase(node,path);
+            //exit loop, tree is fixed
+            break;
+        }
+        //continue checking up the tree
+        node = node->parent;
+    }
+}
+
+/*
+ **    Author: Nick Buras
  **    Function Purpose: make sure tree is not empty, call private delete
  **
  **    Function Output: None
@@ -485,6 +736,8 @@ void c_AVL::p_deleteTree(s_Node* root) {
     }
     //reset root
     this->root = nullptr;
+    //reset node count
+    this->nodeCount = 0;
 }
 
 /*

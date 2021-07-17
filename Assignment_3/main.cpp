@@ -10,7 +10,7 @@
 #include "customErrorClass.h"
 #include "AVL.hpp"
 
-int main(int argc, char * argv[]) {
+int main(int argc, char* argv[]) {
     
     char* fileName = argv[1];
     
